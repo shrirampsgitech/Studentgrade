@@ -6,7 +6,7 @@ pool:
 
 steps:
 
-  # Install and configure Java 17
+  # Select Java 17
   - task: JavaToolInstaller@0
     inputs:
       versionSpec: '17'
@@ -14,27 +14,33 @@ steps:
       jdkSourceOption: 'PreInstalled'
     displayName: 'Configure Java 17'
 
-  # Verify Java compiler and Maven versions
+  # Explicitly configure Java environment
   - script: |
-      echo "Checking Java version"
+      export JAVA_HOME="$(JAVA_HOME_17_X64)"
+      export PATH="$JAVA_HOME/bin:$PATH"
+
+      echo "JAVA_HOME=$JAVA_HOME"
+
       java -version
-
-      echo "Checking Java compiler"
       javac -version
-
-      echo "Checking Maven version"
       mvn -version
-    displayName: 'Verify Java 17 and Maven'
 
-  # Build Maven application
+      echo "Checking compiler location:"
+      which javac
+    displayName: 'Verify Java 17 Compiler'
+
+  # Build application using Java 17
   - script: |
-      mvn clean package
-    displayName: 'Compile and Generate JAR'
+      export JAVA_HOME="$(JAVA_HOME_17_X64)"
+      export PATH="$JAVA_HOME/bin:$PATH"
 
-  # Publish JAR artifact
+      mvn clean package
+    displayName: 'Maven Build'
+
+  # Publish JAR
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(System.DefaultWorkingDirectory)/target'
       artifact: 'StudentGrade-JAR'
       publishLocation: 'pipeline'
-    displayName: 'Publish JAR'
+    displayName: 'Publish JAR Artifact'
