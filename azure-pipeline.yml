@@ -1,0 +1,26 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+  # Check Java and Maven versions
+  - script: |
+      java -version
+      mvn -version
+    displayName: 'Check Java and Maven'
+
+  # Build Java application
+  - script: |
+      mvn clean package
+    displayName: 'Build Maven Project'
+
+  # Publish generated JAR file
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(System.DefaultWorkingDirectory)/target'
+      artifact: 'StudentGrade-JAR'
+      publishLocation: 'pipeline'
+    displayName: 'Publish JAR Artifact'
