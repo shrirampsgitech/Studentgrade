@@ -6,21 +6,35 @@ pool:
 
 steps:
 
-  # Check Java and Maven versions
-  - script: |
-      java -version
-      mvn -version
-    displayName: 'Check Java and Maven'
+  # Install and configure Java 17
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '17'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+    displayName: 'Configure Java 17'
 
-  # Build Java application
+  # Verify Java compiler and Maven versions
+  - script: |
+      echo "Checking Java version"
+      java -version
+
+      echo "Checking Java compiler"
+      javac -version
+
+      echo "Checking Maven version"
+      mvn -version
+    displayName: 'Verify Java 17 and Maven'
+
+  # Build Maven application
   - script: |
       mvn clean package
-    displayName: 'Build Maven Project'
+    displayName: 'Compile and Generate JAR'
 
-  # Publish generated JAR file
+  # Publish JAR artifact
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(System.DefaultWorkingDirectory)/target'
       artifact: 'StudentGrade-JAR'
       publishLocation: 'pipeline'
-    displayName: 'Publish JAR Artifact'
+    displayName: 'Publish JAR'
