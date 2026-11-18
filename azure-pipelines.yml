@@ -1,0 +1,31 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '17'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+    displayName: 'Configure Java 17'
+
+  - script: |
+      java -version
+      javac -version
+      mvn -version
+    displayName: 'Verify Java Version'
+
+  - script: |
+      mvn clean package
+    displayName: 'Build Maven Application'
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(System.DefaultWorkingDirectory)/target'
+      artifact: 'StudentGrade-JAR'
+      publishLocation: 'pipeline'
+    displayName: 'Publish JAR Artifact'
